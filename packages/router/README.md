@@ -2,7 +2,7 @@
 
 ```html
 <script>
-import { Router, Route, NotFound } from '@suavejs/router';
+import { Router, Route } from '@suavejs/router';
 import Settings from './settings.html';
 </script>
 
@@ -22,7 +22,7 @@ import Settings from './settings.html';
     </Route>
   </Route>
 
-  <!-- Embedded routers (settings includes its own Router) -->
+  <!-- Embedded routers (Settings includes its own Router) -->
   <Route path="settings/*"><Settings /></Route>
 
   <!-- Support for code splitting with dynamic components -->
@@ -31,9 +31,9 @@ import Settings from './settings.html';
     <p slot="loading">Loading...</p>
   </Route>
 
-  <!-- If nothing is found, display 404 -->
-  <NotFound>
+  <!-- If no route matches, go to default route and display 404 -->
+  <Route default>
     404 - Not found
-  </NotFound>
+  </Route>
 </Router>
 ```

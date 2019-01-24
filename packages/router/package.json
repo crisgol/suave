@@ -1,0 +1,35 @@
+{
+  "name": "@suave/router",
+  "version": "0.0.0",
+  "author": "Tim Hall <tim.hall.engr@gmail.com>",
+  "license": "MIT",
+  "description": "An accessible router for svelte",
+  "repository": "https://github.com/timhall/suave.git",
+  "keywords": [
+    "svelte",
+    "framework",
+    "accessible",
+    "ally",
+    "router",
+    "routing"
+  ],
+  "main": "dist/suave-router.cjs.js",
+  "module": "dist/suave-router.es.js",
+  "svelte": "src/index.js",
+  "peerDependencies": {
+    "svelte": "^3.0.0-alpha19"
+  },
+  "devDependencies": {
+    "rollup": "^1.1.2",
+    "rollup-plugin-filesize": "^6.0.1",
+    "rollup-plugin-svelte": "^5.0.1",
+    "svelte": "^3.0.0-alpha19"
+  },
+  "scripts": {
+    "test": "exit 0",
+    "build": "rollup -c"
+  },
+  "files": [
+    "dist"
+  ]
+}

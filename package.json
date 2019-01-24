@@ -1,17 +1,6 @@
 {
-  "name": "suave",
-  "version": "0.0.0",
-  "author": "Tim Hall <tim.hall.engr@gmail.com> ",
-  "license": "MIT",
-  "description": "Coming soon - An accessible framework for svelte",
-  "repository": "https://github.com/timhall/suave.git",
-  "keywords": ["svelte", "framework", "accessible", "ally", "router", "routing"],
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "scripts": {
-    "test": "exit 0"
-  },
-  "files": [
-    "dist"
+  "private": true,
+  "workspaces": [
+    "packages/*"
   ]
 }

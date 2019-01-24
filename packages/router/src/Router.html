@@ -1,0 +1,25 @@
+<script context="module">
+  import { readable } from 'svelte/store';
+
+  export class Router {
+    constructor(history, parent) {
+      // TODO
+    }
+
+    register(path, component) {
+      // TODO
+    }
+  }
+</script>
+
+<script>
+  import { getContext, setContext } from 'svelte';
+
+  export let history;
+
+  const parent = getContext(Router);
+  const router = new Router(history, parent);
+  setContext(Router, router);
+</script>
+
+<slot />
