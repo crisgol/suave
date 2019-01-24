@@ -1,0 +1,14 @@
+<script>
+  import { onMount } from 'svelte';
+  export let ms = 200;
+
+  let elapsed = false;
+  onMount(() => {
+    const id = setTimeout(() => elapsed = true, ms);  
+    return () => clearTimeout(id);
+  });
+</script>
+
+{#if elapsed}
+  <slot />
+{/if}

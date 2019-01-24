@@ -1,4 +1,5 @@
 <script context="module">
+  import { onDestroy } from 'svelte';
   import { readable } from 'svelte/store';
 
   export class Router {
@@ -6,7 +7,18 @@
       // TODO
     }
 
-    register(path, component) {
+    register(path, Component) {
+      // TODO
+
+      onDestroy(() => this.unregister(path, component));
+
+      const match = readable(() => { /* TODO */ });
+      match.replace = Component => { /* TODO */ };
+
+      return match;
+    }
+
+    unregister(path, component) {
       // TODO
     }
   }
@@ -19,6 +31,7 @@
 
   const parent = getContext(Router);
   const router = new Router(history, parent);
+  
   setContext(Router, router);
 </script>
 

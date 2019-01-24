@@ -1,14 +1,33 @@
 <script>
   import { getContext } from 'svelte';
-  import { without } from './utils';
+  import { without, isComponent, isPromise } from './utils';
   import { Router } from './Router.html';
+  import Delay from './Delay.html';
 
   export let path;
   export let component;
+  export let preload = () => {};
+  export let beforeLeave = () => {};
+  
   let props;
-
   const router = getContext(Router);
-  const match = router.register(props.default ? '*' : path, component);
+  
+  let Component = null;
+  $: {
+    if (component && isComponent(component)) {
+      // Simulate () => import('./Component.html')
+      Component = () => Promise.resolve({ default: component, preload, beforeLeave });
+    } else if (component && isPromise(component)) {
+      // Assume promise is import('./Component.html'), wrap in function
+      Component = () => component;
+    } else {
+      // Component is either import function or nothing
+      Component = component || null;
+    }
+  }
+  
+  const match = router.register(props.default ? '*' : path, Component);
+  $: match.replace(Component);
 
   let passthrough;
   $: passthrough = without(props, ['path', 'component', 'default']);
@@ -17,13 +36,17 @@
 <svelte:meta bind:props />
 
 {#if $match}
-  {#if $match.component}
-    {#await $match.component}
-      <slot name="loading" {...$match.params} />
-    {:then { Component, preloaded = {} }}
-      <Component {...preloaded} {...passthrough}><slot {...$match.params} /></Component>
+  {#if $match.loading}
+    {#await $match.loading}
+      <Delay>
+        <slot name="loading" {...$match.params} />
+      </Delay>
+    {:then { Component, preloaded }}
+      <Component {...preloaded} {...passthrough}>
+        <slot {...$match.params} />
+      </Component>
     {:catch error}
-      <!-- TODO -->
+      <slot name="error" {error} />
     {/await}
   {:else}
     <slot {...$match.params} />
