@@ -2,13 +2,16 @@
 
 - [Installation](#installation)
 - [Basic usage](#basic-usage)
+- [Links](#links)
 - [URL parameters](#url-parameters)
 - [Nested routes](#nested-routes)
 - [Nested routers](#nested-routers)
 - [Multiple routers](#multiple-routers)
 - [Component](#component)
+- [Redirect](#redirect)
 - [Lifecycle (preload and beforeLeave)](#lifecyle)
 - [Context](#context)
+- [Methods](#methods)
 - [Code splitting](#code-splitting)
 - [SSR](#ssr)
 - [Errors](#errors)
@@ -27,8 +30,8 @@ yarn add @suave/router
 
 ```html
 <script>
-import { Router, Route } from '@suave/router';
-import Todos from './Todos.html';
+  import { Router, Route } from '@suave/router';
+  import Todos from './Todos.html';
 </script>
 
 <Router>
@@ -38,19 +41,26 @@ import Todos from './Todos.html';
   <Route path="/todos">
     <Todos />
   </Route>
-  <Route default>
-    404 - Not found
-  </Route>
+
+  <Route default let:location>
+    404 - {location} not found
+  </div>
 </Router>
 ```
+
+TODO location on `Router` or `Route` (`let:match` makes more sense on `Route`)
+
+### Links
+
+TODO capturing `<a>` links and `rel=prefetch` on links and disabling scroll restoration.
 
 ### URL parameters
 
 ```html
 <script>
-import { Router, Route } from '@suave/router';
-import Todos from './Todos.html';
-import Todo from './Todo.html';
+  import { Router, Route } from '@suave/router';
+  import Todos from './Todos.html';
+  import Todo from './Todo.html';
 </script>
 
 <Router>
@@ -67,7 +77,7 @@ import Todo from './Todo.html';
 
 ```html
 <script>
-import { Router, Route } from '@suave/router';
+  import { Router, Route } from '@suave/router';
 </script>
 
 <Router>
@@ -86,8 +96,8 @@ import { Router, Route } from '@suave/router';
 
 ```html
 <script>
-import { Router, Route } from '@suave/router';
-import Settings from './Settings.html';
+  import { Router, Route } from '@suave/router';
+  import Settings from './Settings.html';
 </script>
 
 <Router>
@@ -103,7 +113,7 @@ import Settings from './Settings.html';
 ```html
 <!-- Settings.html -->
 <script>
-import { Router, Route } from '@suave/router';
+  import { Router, Route } from '@suave/router';
 </script>
 
 <Router>
@@ -120,7 +130,7 @@ import { Router, Route } from '@suave/router';
 
 ```html
 <script>
-import { Router, Route } from '@suave/router';
+  import { Router, Route } from '@suave/router';
 </script>
 
 <main>
@@ -141,38 +151,48 @@ import { Router, Route } from '@suave/router';
 
 ```html
 <script>
-import { Router, Route } from '@suave/router';
-import A from './A.html';
-import B from './B.html';
+  import { Router, Route } from '@suave/router';
+  import A from './A.html';
+  import B from './B.html';
+
+  export let cohort;
 </script>
 
 <Router>
-  <Route path="/a" component={A} />
-  <Route path="/b" component={B} />
+  <Route path="/nested" component="{cohort === 'a' ? A : B}" />
 </Router>
 ```
+
+### Redirect
+
+```html
+<script>
+  import { Router, Route, Redirect } from '@suave/router';
+</script>
+
+<Router>
+  <Route path="/blog">
+    <Redirect path="/articles" />
+  </Route>
+  <Route path="/articles">
+    Articles
+  </Route>
+</Router>
+```
+
+TODO pass through stem (e.g. `/blog/1` -> `/articles/1`)
 
 ### Lifecycle (preload and beforeLeave)
 
 ```html
 <script>
-import { Router, Route } from '@suave/router';
-import Todo from './Todo.html';
-import CreateTodo from './CreateTodo.html';
-
-async function loadTodo(transition) {
-  const { id } = transition.params;
-  const response = await fetch(`/api/todos/${id}`);
-  const todo = await response.json();
-  
-  return todo;
-}
+  import { Router, Route } from '@suave/router';
+  import Todo, { preload } from './Todo.html';
+  import CreateTodo from './CreateTodo.html';
 </script>
 
 <Router>
-  <Route path="/todo/{id}" preload={loadTodo} let:preloaded={todo}>
-    <Todo {todo} />
-  </Route>
+  <Route path="/todo/{id}" {preload} component={Todo} />
   <Route path="/todo/create">
     <CreateTodo />
   </Route>
@@ -180,16 +200,36 @@ async function loadTodo(transition) {
 ```
 
 ```html
+<!-- Todo.html -->
+<script context="module">
+  export function preload(transition) {
+    const { id } = transition.params;
+    const response = await fetch(`/api/todos/${id}`);
+    const todo = await response.json();
+
+    return { todo };
+  }
+</script>
+
+<script>
+  export let todo;
+</script>
+
+Description: {todo.description}
+```
+
+```html
 <!-- CreateTodo.html -->
 <script>
-import { beforeLeave } from '@suave/router';
+  import { beforeLeave } from '@suave/router';
 
-let value = '';
-beforeLeave(transition => {
-  if (value !== '' && !confirm('Are you sure?')) {
-    transition.abort();
-  }
-});
+  let value = '';
+  
+  beforeLeave(transition => {
+    if (value !== '' && !confirm('Are you sure you want to leave?')) {
+      transition.abort();
+    }
+  });
 </script>
 
 <label>Description: <input bind:value /></label>
@@ -197,24 +237,67 @@ beforeLeave(transition => {
 
 ### Context
 
-TODO
+TODO router, location, match
+
+### Methods
+
+TODO back, forward, go, push, replace
+
+```html
+<script>
+  import { getContext } from 'svelte';
+  import { Router } from '@suave/router';
+
+  const { back, forward } = getContext(Router);
+</script>
+
+<button on:click={back}>Back</button>
+<button on:click={forward}>Forward</button>
+```
 
 ### Code splitting
 
 ```html
 <script>
-import { Router, Route } from '@suave/router';
+  import { Router, Route } from '@suave/router';
+
+  const Index = () => import('/index.html');
+  const Todos = () => import('/todos.html');
+  const Settings = () => import('/settings.html');
 </script>
 
 <Router>
-  <Route path="/" component="{() => import('/index.html')}" />
-  <Route path="/todos" component="{() => import('/todos.html')}">
-    <p slot="loading">Loading...</p>
+  <Route path="/" component="{Index}" />
+  <Route path="/todos" component="{Todos}">
+    <p slot="loading">
+      Loading Todos component then preloading...
+    </p>
   </Route>
-  <Route path="/settings" component="{() => import('/settings.html')}">
+  <Route path="/settings" component="{Settings}">
     <p>(This is put in settings's slot)</p>
   </Route>
 </Router>
+```
+
+```html
+<!-- Todos -->
+<script context="module">
+  // The preload lifecycle hook is called automatically
+  // for imported components
+  export async function preload(transition) {
+    const response = await fetch('/api/todos');
+    const todos = await response.json();
+
+    return { todos };
+  }
+</script>
+<script>
+  export let todos;
+</script>
+
+{#each todos as todo}
+  ...
+{/each}
 ```
 
 ### SSR
@@ -222,8 +305,8 @@ import { Router, Route } from '@suave/router';
 ```html
 <!-- App.html -->
 <script>
-import { Router, Route } from '@suave/router';
-export let history;
+  import { Router, Route } from '@suave/router';
+  export let history;
 </script>
 
 <Router {history}>
@@ -234,15 +317,22 @@ export let history;
 
 ```js
 require('svelte/register');
-const App = require('./App.html');
 const polka = require('polka');
+const { createMemoryHistory } = require('@suave/router');
+const App = require('./App.html');
 const template = require('./template');
 
 polka().get('/*', (req, res) => {
-  const history = { location: req.url };
+  const history = createMemoryHistory(req.url);
   const { html, css, head } = App.render({ history });
+
+  if (history.redirect) {
+    return res.redirect(history.redirect);
+  }
+
   const page = template(html, css, head);
 
+  res.status(history.status);
   res.end(page);
 })
 ```
@@ -251,27 +341,24 @@ polka().get('/*', (req, res) => {
 
 ```html
 <script>
-import { Router, Route } from '@suave/router';
+  import { Router, Route } from '@suave/router';
 </script>
 
 <Router>
   <Route path="/" component="{() => import('/nonexistent.html')}" />
-  
-  <Route default let:error>
-    {#if error}
-      500 - {error}
-    {:else}
-      404 - Not Found
-    {/if}
-  </Route>
+
+  <Route catch let:error>
+    500 - {error}
+  </div>
+</Router>
 ```
 
 ### Hash history
 
 ```html
 <script>
-import { Router, Route, HashHistory } from '@suave/router';
-const history = new HashHistory();
+  import { Router, Route, createHashHistory } from '@suave/router';
+  const history = createHashHistory();
 </script>
 
 <Router {history}>
@@ -291,3 +378,18 @@ TODO
 
 TODO
 
+### Redirect
+
+TODO
+
+### createHistory
+
+TODO
+
+### createMemoryHistory
+
+TODO
+
+### createHashHistory
+
+TODO
