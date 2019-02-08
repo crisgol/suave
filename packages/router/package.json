@@ -17,13 +17,17 @@
   "module": "dist/suave-router.es.js",
   "svelte": "src/index.js",
   "peerDependencies": {
-    "svelte": "^3.0.0-alpha19"
+    "svelte": "^3.0.0-beta.3"
   },
   "devDependencies": {
     "rollup": "^1.1.2",
+    "rollup-plugin-dts": "^0.10.0",
     "rollup-plugin-filesize": "^6.0.1",
     "rollup-plugin-svelte": "^5.0.1",
-    "svelte": "^3.0.0-alpha19"
+    "rollup-plugin-typescript": "^1.0.0",
+    "svelte": "^3.0.0-beta.3",
+    "tslib": "^1.9.3",
+    "typescript": "^3.3.3"
   },
   "scripts": {
     "test": "exit 0",

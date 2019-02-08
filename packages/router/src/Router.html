@@ -1,38 +1,28 @@
-<script context="module">
-  import { onDestroy } from 'svelte';
-  import { readable } from 'svelte/store';
-
-  export class Router {
-    constructor(history, parent) {
-      // TODO
-    }
-
-    register(path, Component) {
-      // TODO
-
-      onDestroy(() => this.unregister(path, component));
-
-      const match = readable(() => { /* TODO */ });
-      match.replace = Component => { /* TODO */ };
-
-      return match;
-    }
-
-    unregister(path, component) {
-      // TODO
-    }
-  }
-</script>
-
 <script>
-  import { getContext, setContext } from 'svelte';
+  import { onDestroy } from 'svelte';
+  import { getRouter, setRouter, getMatch } from './context';
+  import { createRouter } from './routing';
 
   export let history;
+  export let base;
+  export let sitemap;
 
-  const parent = getContext(Router);
-  const router = new Router(history, parent);
-  
-  setContext(Router, router);
+  const parent = getRouter();
+  let router;
+  if (parent) {
+    const match = getMatch();
+    
+    const _history = history || parent.history;
+    const _base = join(parent.base, match.path, base);
+    // TODO sitemap
+
+    router = createRouter({ history: _history, base: _base });
+  } else {
+    router = createRouter({ history, base, sitemap });
+  }
+
+  setRouter(router);
+  onDestroy(() => router.stop());
 </script>
 
 <slot />
