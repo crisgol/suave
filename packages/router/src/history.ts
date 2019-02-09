@@ -1,7 +1,7 @@
 // Inspired by and copied from @reach/router
 // Copyright (c) 2018-present, Ryan Florence
 
-import { readable } from 'svelte/store';
+import { readwrite } from './utils';
 import { Source } from './sources';
 
 export interface History {
@@ -25,9 +25,8 @@ export interface Location {
 export function createHistory(source: Source): History {
   // Use readable source in order to better handle listeners
   // Only need to listen to popstate, push and replace happen internally
-  let setLocation = () => {};
-  const location = readable(set => {
-    setLocation = () => set(getLocation(source));
+  const location = readwrite(set => {
+    const setLocation = () => set(getLocation(source));
     source.addEventListener('popstate', setLocation);
 
     return () => {
@@ -53,7 +52,7 @@ export function createHistory(source: Source): History {
       source.location[replace ? 'replace' : 'assign'](url);
     }
 
-    setLocation();
+    location.set(getLocation(source));
   };
 
   return { subscribe: location.subscribe, navigate };
