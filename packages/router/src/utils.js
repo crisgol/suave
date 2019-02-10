@@ -8,7 +8,7 @@ export function isPromise(value) {
   return value && typeof value.then === 'function';
 }
 
-const noop = () => {};
+export function noop() {}
 
 export function readwrite(start, initial) {
   let _set = noop;

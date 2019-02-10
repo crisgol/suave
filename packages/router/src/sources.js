@@ -33,7 +33,6 @@ export function createMemorySource(pathname = '/') {
         locations[index] = { pathname, search };
         states[index] = state;
       },
-
       back() {
         if (index === 0) return;
         index -= 1;

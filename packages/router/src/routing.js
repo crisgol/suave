@@ -32,6 +32,10 @@ export function createRouter(options = {}) {
     // TODO
   };
 
+  const prefetch = url => {
+    // TODO
+  };
+
   const start = () => {
     // TODO
   };
