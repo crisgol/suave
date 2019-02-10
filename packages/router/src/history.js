@@ -2,27 +2,8 @@
 // Copyright (c) 2018-present, Ryan Florence
 
 import { readwrite } from './utils';
-import { Source } from './sources';
 
-export interface History {
-  subscribe(callback: (location: Location) => void): () => void;
-  navigate(url: string, options?: { state?: object; replace: boolean }): void;
-}
-
-export interface Location {
-  pathname: string;
-  search: string;
-
-  // Other values are likely to be included in browser,
-  // but aren't support by other sources
-  //
-  // (hash, href, protocol, host, hostname, port, origin)
-
-  state: object;
-  key: string;
-}
-
-export function createHistory(source: Source): History {
+export function createHistory(source) {
   // Use readable source in order to better handle listeners
   // Only need to listen to popstate, push and replace happen internally
   const location = readwrite(set => {
@@ -34,10 +15,7 @@ export function createHistory(source: Source): History {
     };
   }, getLocation(source));
 
-  const navigate = (
-    url: string,
-    options: { state: object | undefined; replace: boolean }
-  ) => {
+  const navigate = (url, options = {}) => {
     let { state, replace = false } = options;
     state = { ...state, key: String(Date.now()) };
 
@@ -58,10 +36,12 @@ export function createHistory(source: Source): History {
   return { subscribe: location.subscribe, navigate };
 }
 
-function getLocation(source): Location {
+function getLocation(source) {
+  const state = source.history.state;
+
   return {
     ...source.location,
-    state: source.history.state,
-    key: (source.history.state && source.history.state.key) || 'initial'
+    state,
+    key: (state && state.key) || 'initial'
   };
 }

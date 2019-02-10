@@ -7,5 +7,6 @@ export {
 } from './sources';
 export { createRouter } from './routing';
 
-// export { default as Router } from './Router.html';
-// export { default as Route } from './Route.html';
+// TODO
+// export { default as Router } from './Router.svelte';
+// export { default as Route } from './Route.svelte';

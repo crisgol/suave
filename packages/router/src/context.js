@@ -1,5 +1,4 @@
 import { getContext, setContext } from 'svelte';
-import { Router, Match } from './routing';
 
 export const symbols = {
   catch: Symbol('catch'),
@@ -7,18 +6,18 @@ export const symbols = {
   match: Symbol('match')
 };
 
-export function getRouter(): Router | undefined {
+export function getRouter() {
   return getContext(symbols.router);
 }
 
-export function setRouter(router: Router) {
+export function setRouter(router) {
   return setContext(symbols.router, router);
 }
 
-export function getMatch(): Match | undefined {
+export function getMatch() {
   return getContext(symbols.match);
 }
 
-export function setMatch(match: Match) {
+export function setMatch(match) {
   return setContext(symbols.match, match);
 }
